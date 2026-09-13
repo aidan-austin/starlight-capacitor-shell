@@ -139,3 +139,24 @@ keyPassword=******
 | --- | --- |
 | 本仓 WebView 壳 | `cool.starlight.skin` |
 | Flutter 原生客户端 | `cool.starlight.starlight_skin` |
+
+---
+
+## 八、远端仓库与日常操作
+
+| remote | 地址 | 说明 |
+| --- | --- | --- |
+| `origin` | `git@github.com:aidan-austin/starlight-capacitor-shell.git` | 主仓，SSH 免密推送 |
+| `gitea` | `https://git.starlight.cool/Elysia52199/starlight-capacitor-shell.git` | 备用私仓。该站入口（腾讯云 EdgeOne → 源站 nginx）把请求体限制在 1MB，**需管理员调大 `client_max_body_size` 后**才能推完整仓（本仓约 6.7MB） |
+
+日常三步（在 `F:\sls-capacitor-shell` 目录下执行）：
+
+```powershell
+git add -A                                  # 把改动加入暂存区
+git commit -m "说明这次改了什么"              # 提交
+git push                                    # 推到 GitHub（origin）
+# git push gitea                            # 以后 Gitea 限制放开后，同步推一份
+```
+
+`.gitignore` 已排除 `node_modules/`、构建产物、`keystore.properties` 与 `*.keystore`，
+所以日常 `git add -A` 不会误传密钥或几十 MB 的编译缓存；两个分发 APK 是特例，已用 `!` 放行保留在版本控制中。
