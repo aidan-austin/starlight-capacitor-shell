@@ -1,0 +1,16 @@
+# ????????????? gradlew ? CRLF ?? /bin/sh^M ??
+* text=auto
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.sh  text eol=lf
+gradlew text eol=lf
+
+# ???????????
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.jar binary
+*.apk binary
+*.keystore binary
+*.jks binary

@@ -1,0 +1,27 @@
+{
+  "appId": "cool.starlight.skin",
+  "appName": "StarLight皮肤站",
+  "webDir": "dist",
+  "server": {
+    "url": "https://skin.starlight.cool/",
+    "cleartext": true,
+    "androidScheme": "https",
+    "allowNavigation": ["skin.starlight.cool"]
+  },
+  "android": {
+    "backgroundColor": "#09090b",
+    "allowMixedContent": true,
+    "captureInput": true
+  },
+  "ios": {
+    "backgroundColor": "#09090b",
+    "contentInset": "always"
+  },
+  "plugins": {
+    "StatusBar": {
+      "style": "DARK",
+      "backgroundColor": "#09090b",
+      "overlaysWebView": true
+    }
+  }
+}

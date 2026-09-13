@@ -1,0 +1,36 @@
+# ---- Node ----
+node_modules/
+
+# ---- Capacitor / Android 构建产物 ----
+android/.gradle/
+android/build/
+android/app/build/
+android/capacitor-cordova-android-plugins/build/
+android/.kotlin/
+android/app/.cxx/
+android/local.properties
+android/keystore.properties
+
+# ---- 签名密钥与本地工具（务必不要提交！）----
+*.keystore
+*.jks
+.tools/
+
+# ---- IDE / 临时文件 ----
+.idea/
+*.iml
+*.log
+.DS_Store
+
+# ---- release 产物 ----
+# 只保留随仓分发的两个 v1.0 包（已用 ! 放行），其余构建产物不入库
+releases/*.apk
+!releases/StarLight皮肤站-v1.0-debug.apk
+!releases/StarLight皮肤站-v1.0-release.apk
+
+# 说明：
+# 1) dist/ 是 Capacitor 的 webDir（仅一个占位页 index.html），必须提交，故不忽略。
+# 2) android/app/src/main/assets/{public,capacitor.config.json,capacitor.plugins.json}
+#    和 android/app/src/main/res/xml/config.xml 通常由 `npx cap sync android` 生成，
+#    android/.gitignore 默认忽略它们；本仓已用 `git add -f` 强制入库，
+#    这样 clone 后不装 node_modules 也能直接 gradlew 打包。
