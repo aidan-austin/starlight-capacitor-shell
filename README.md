@@ -11,22 +11,30 @@
 
 ## 一、成品 APK
 
-`releases/` 下有两个已打好的包（本仓即随源码一起分发这两个文件）：
+`releases/` 下有三个已打好的包（本仓即随源码一起分发）：
 
 | 文件 | 体积 | 用途 |
 | --- | --- | --- |
-| `StarLight皮肤站-v1.0-release.apk` | 3.2 MB | **正式分发用**，已用 release 密钥签名 |
+| `StarLight皮肤站-v1.1-release.apk` | 3.1 MB | **当前正式版**：修复返回键 + 状态栏/挖孔适配 |
+| `StarLight皮肤站-v1.0-release.apk` | 3.2 MB | 历史版本，已用 release 密钥签名 |
 | `StarLight皮肤站-v1.0-debug.apk` | 4.2 MB | 自测用，debug 签名，体积略大 |
 
 包信息（`aapt dump badging` 实测）：
 
 ```
-package: cool.starlight.skin   versionCode=1   versionName=1.0
+package: cool.starlight.skin   versionCode=2  versionName=1.1   （v1.0 为 versionCode=1 / 1.0）
 application-label: StarLight皮肤站
 launchable-activity: cool.starlight.skin.MainActivity
 minSdkVersion=23   targetSdkVersion=35   compileSdkVersion=35
 权限：INTERNET、WRITE/READ_EXTERNAL_STORAGE(maxSdk 28)
 ```
+
+### 版本更新记录
+
+| 版本 | 变更 |
+| --- | --- |
+| **v1.1** | ① **返回键修复**：站内子页面返回上一页，停在首页时返回键直接退出到桌面（此前首页按返回无反应）<br>② **状态栏/挖孔适配**：`StatusBar.overlaysWebView` 改为 `false`，网页不再顶到物理屏幕最上沿，内容不会被状态栏、前置摄像头挖孔压住（网站自身没有 `viewport-fit=cover` 与安全区 padding，所以只能由壳来让出空间）<br>③ 版本号 versionCode 1 → 2 |
+| v1.0 | 首个版本：WebView 远程加载 + 系统下载管理器接管下载 |
 
 ### 安装到手机
 1. 把 `.apk` 传到手机（微信 / QQ / 网盘 / 数据线均可）。
@@ -57,8 +65,10 @@ releases/                  # 随仓分发的 APK
 ## 三、如何重新打包 / 升级
 
 ### 环境
-- **JDK 21**
-- **Android SDK**（platform 35 + build-tools 35）
+- **JDK 21**（⚠️ Capacitor 7 的模块要求 Java 21，用 JDK 17 会报 `无效的源发行版：21`）
+  - 本机已装：`F:\sls\.tools\jdk21`（Temurin 21.0.12.1+1）
+  - 注意：原先 README 里那个 Minecraft 内置 JDK 路径已被启动器清掉，不要再用
+- **Android SDK**（platform 35 + build-tools 35）：本机 `F:\sls\.tools\android-sdk`
 - **Node / npm**（仅 `npx cap sync` 需要；本仓已把 sync 产物强制入库，可不装）
 
 ### 步骤
@@ -67,10 +77,10 @@ releases/                  # 随仓分发的 APK
 npm install
 npx cap sync android
 
-# 2) 环境变量
-$env:JAVA_HOME='<你的 JDK 21 目录>'
-$env:ANDROID_HOME='<你的 Android SDK 目录>'
-$env:GRADLE_USER_HOME='<你的 gradle 缓存目录>'
+# 2) 环境变量（换成你自己的路径；下面是本机实际值）
+$env:JAVA_HOME='F:\sls\.tools\jdk21'
+$env:ANDROID_HOME='F:\sls\.tools\android-sdk'
+$env:GRADLE_USER_HOME='F:\sls\.tools\gradle-home'
 
 # 3) 打包
 Set-Location android
@@ -117,6 +127,8 @@ keyPassword=******
 ## 五、与前端的实际关系
 
 - **运行方式**：`MainActivity extends BridgeActivity`，WebView 打开 `https://skin.starlight.cool/`；`allowNavigation` 限定在该域名内。
+- **返回键**：`MainActivity` 里用 `OnBackPressedCallback` 接管 —— 网页能回退（`WebView.canGoBack()`）就先回退一步，已在首页则 `finish()` 退出到桌面。Capacitor 自带的 `App` 插件在无法回退时什么都不做，所以配置里加了 `plugins.App.disableBackButtonHandler=true` 把它关掉，改由我们处理。
+- **状态栏 / 挖孔**：`plugins.StatusBar.overlaysWebView=false`，WebView 不再顶到物理屏幕最上沿；状态栏独占一条（背景 `#09090b`），内容从状态栏下方开始，因此不会被状态栏图标或前摄挖孔遮挡。
 - **界面来源**：完全来自线上前端（Vue 3 + Vite 构建产物），本仓不含任何网页资源，`dist/index.html` 只是 115 字节占位页。
 - **因此**：站点更新 = App 立即更新；离线不可用（首次打开必须联网）。
 - 线上站点目前同样没有 PWA 清单 / Service Worker，所以「添加到主屏幕」只能得到普通书签，没有离线缓存。

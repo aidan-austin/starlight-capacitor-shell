@@ -23,10 +23,10 @@ android/keystore.properties
 .DS_Store
 
 # ---- release 产物 ----
-# 只保留随仓分发的两个 v1.0 包（已用 ! 放行），其余构建产物不入库
+# 只保留随仓分发的历史版本（已用 ! 放行），其它构建产物不入库
 releases/*.apk
-!releases/StarLight皮肤站-v1.0-debug.apk
-!releases/StarLight皮肤站-v1.0-release.apk
+!releases/StarLight皮肤站-v1.0-*.apk
+!releases/StarLight皮肤站-v1.1-*.apk
 
 # 说明：
 # 1) dist/ 是 Capacitor 的 webDir（仅一个占位页 index.html），必须提交，故不忽略。

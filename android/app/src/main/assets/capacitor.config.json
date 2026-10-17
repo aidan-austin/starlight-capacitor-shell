@@ -23,7 +23,10 @@
 		"StatusBar": {
 			"style": "DARK",
 			"backgroundColor": "#09090b",
-			"overlaysWebView": true
+			"overlaysWebView": false
+		},
+		"App": {
+			"disableBackButtonHandler": true
 		}
 	}
 }
