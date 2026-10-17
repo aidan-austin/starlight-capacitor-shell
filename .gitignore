@@ -27,6 +27,7 @@ android/keystore.properties
 releases/*.apk
 !releases/StarLight皮肤站-v1.0-*.apk
 !releases/StarLight皮肤站-v1.1-*.apk
+!releases/StarLight皮肤站-v1.2-*.apk
 
 # 说明：
 # 1) dist/ 是 Capacitor 的 webDir（仅一个占位页 index.html），必须提交，故不忽略。

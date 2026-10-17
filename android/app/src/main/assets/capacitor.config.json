@@ -13,18 +13,13 @@
 	"android": {
 		"backgroundColor": "#09090b",
 		"allowMixedContent": true,
-		"captureInput": true
+		"captureInput": false
 	},
 	"ios": {
 		"backgroundColor": "#09090b",
 		"contentInset": "always"
 	},
 	"plugins": {
-		"StatusBar": {
-			"style": "DARK",
-			"backgroundColor": "#09090b",
-			"overlaysWebView": false
-		},
 		"App": {
 			"disableBackButtonHandler": true
 		}

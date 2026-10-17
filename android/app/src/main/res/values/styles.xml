@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
@@ -13,6 +13,18 @@
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
         <item name="android:background">@null</item>
+        <!-- 与网站/开场动画同样的深色底，避免启动瞬间白屏闪一下 -->
+        <item name="android:windowBackground">@color/ic_launcher_background</item>
+        <!--
+          Android 15（API 35）起，targetSdk 35 的应用会被系统强制 edge-to-edge，
+          Capacitor 的 StatusBar.overlaysWebView=false 用的是旧的
+          SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN 开关，在新系统上会被忽略，
+          结果是 WebView 又钻到状态栏/挖孔下面。
+          这个属性显式退出 edge-to-edge 强制，让状态栏重新独占一条，
+          行为与 Android 10~14 上保持一致。
+          注意：这是过渡性开关，未来 Android 版本会移除；届时需改为自己处理 WindowInsets。
+        -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
     </style>
 
 
@@ -20,5 +32,7 @@
         <item name="windowSplashScreenBackground">@color/ic_launcher_background</item>
         <item name="windowSplashScreenAnimatedIcon">@mipmap/ic_launcher</item>
         <item name="postSplashScreenTheme">@style/AppTheme.NoActionBar</item>
+        <!-- 启动页窗口也带上，避免第一帧就是 edge-to-edge -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement" tools:targetApi="35">true</item>
     </style>
 </resources>

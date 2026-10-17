@@ -33,7 +33,8 @@ minSdkVersion=23   targetSdkVersion=35   compileSdkVersion=35
 
 | 版本 | 变更 |
 | --- | --- |
-| **v1.1** | ① **返回键修复**：站内子页面返回上一页，停在首页时返回键直接退出到桌面（此前首页按返回无反应）<br>② **状态栏/挖孔适配**：`StatusBar.overlaysWebView` 改为 `false`，网页不再顶到物理屏幕最上沿，内容不会被状态栏、前置摄像头挖孔压住（网站自身没有 `viewport-fit=cover` 与安全区 padding，所以只能由壳来让出空间）<br>③ 版本号 versionCode 1 → 2 |
+| **v1.2**（代码就绪，待打包） | ① **开屏动画**：白色像素星星自下而上渐入 → 左移，`StarLight` 沿同方向滑入（主页同款 `#FF1CF7→#B249F8` 竖向渐变字）→ 停留约 1 秒后淡出，整组水平居中<br>② **主题记忆**：启动时读网页 `<html data-theme>`（`autumn-light` / `black-dark`）存进本机，下次开屏沿用；**首次启动固定深色**（与网站默认一致）<br>③ **双击返回**：首页第一次按返回弹「再按一次退出应用」，2 秒内再按一次才退出<br>④ **输入法修复**：`android.captureInput` 改为 `false`，修复「光标放到文本中间输入、字却跑到末尾」<br>⑤ 状态栏/WebView 底色跟随主题；移除 `@capacitor/status-bar` 插件（它会用配置里的固定颜色覆盖主题色）<br>⑥ 清理：删除模板残留的 `splash.png`、示例测试类、未使用的 `site_icon.png` |
+| **v1.1** | ① **返回键修复**：站内子页面返回上一页，停在首页时返回键直接退出到桌面（此前首页按返回无反应）<br>② **状态栏/挖孔适配**：网页不再顶到物理屏幕最上沿，内容不会被状态栏、前置摄像头挖孔压住（网站自身没有 `viewport-fit=cover` 与安全区 padding，所以只能由壳来让出空间）<br>③ 版本号 versionCode 1 → 2 |
 | v1.0 | 首个版本：WebView 远程加载 + 系统下载管理器接管下载 |
 
 ### 安装到手机
@@ -46,14 +47,14 @@ minSdkVersion=23   targetSdkVersion=35   compileSdkVersion=35
 ## 二、仓库结构
 
 ```
-capacitor.config.json      # Capacitor 配置：App 信息 + 远程加载 URL + 状态栏等
-package.json               # @capacitor/{core,android,app,status-bar} + CLI
+capacitor.config.json      # Capacitor 配置：App 信息 + 远程加载 URL + captureInput
+package.json               # @capacitor/{core,android,app} + CLI
 dist/index.html            # Capacitor 的 webDir，占位页（远程模式下不显示）
-site_icon.png              # 图标源图
 android/                   # 原生 Android 工程（Gradle）
-  app/src/main/java/cool/starlight/skin/MainActivity.java   # 主 Activity（含下载处理）
-  app/src/main/AndroidManifest.xml                          # 清单（网络权限等）
-  app/src/main/res/                                         # 图标 / 启动图 / 名称
+  app/src/main/java/cool/starlight/skin/MainActivity.java   # 主 Activity：开屏动画 / 主题 / 返回键 / 下载
+  app/src/main/res/drawable/logo_star.png                   # 开屏用的网站星星图标（132×133 像素图）
+  app/src/main/AndroidManifest.xml                          # 清单（网络权限、adjustResize 等）
+  app/src/main/res/                                         # 图标 / 名称 / 主题
   app/build.gradle                                          # 版本号 + 签名配置
   keystore.properties                                       # 签名密钥路径（勿入库，见第三节）
   local.properties                                          # SDK 路径（勿入库）
@@ -97,7 +98,7 @@ Set-Location android
 
 ### 改 App 名称 / 图标
 - 名称：`android\app\src\main\res\values\strings.xml`
-- 图标：`android\app\src\main\res\mipmap-*` 下的 `ic_launcher*.png`（源图 `site_icon.png`）
+- 图标：`android\app\src\main\res\mipmap-*` 下的 `ic_launcher*.png`（原图来自网站 `/logo-static.png`，本仓不再保存源图，需要时从站点或私有仓 `frontend/public/` 取）
 
 ### 改加载的站点
 编辑 `capacitor.config.json` 的 `server.url` 和 `allowNavigation`，然后 `npx cap sync android` 重新打包。
@@ -127,8 +128,11 @@ keyPassword=******
 ## 五、与前端的实际关系
 
 - **运行方式**：`MainActivity extends BridgeActivity`，WebView 打开 `https://skin.starlight.cool/`；`allowNavigation` 限定在该域名内。
-- **返回键**：`MainActivity` 里用 `OnBackPressedCallback` 接管 —— 网页能回退（`WebView.canGoBack()`）就先回退一步，已在首页则 `finish()` 退出到桌面。Capacitor 自带的 `App` 插件在无法回退时什么都不做，所以配置里加了 `plugins.App.disableBackButtonHandler=true` 把它关掉，改由我们处理。
-- **状态栏 / 挖孔**：`plugins.StatusBar.overlaysWebView=false`，WebView 不再顶到物理屏幕最上沿；状态栏独占一条（背景 `#09090b`），内容从状态栏下方开始，因此不会被状态栏图标或前摄挖孔遮挡。
+- **返回键**：`OnBackPressedCallback` 接管 —— 网页能回退（`WebView.canGoBack()`）先回退一步；已在首页时第一次按弹「再按一次退出应用」，2 秒内再按一次才 `finish()`。`plugins.App.disableBackButtonHandler=true` 关掉 Capacitor 自带处理，避免双重响应。
+- **状态栏 / 挖孔**：不再依赖 `@capacitor/status-bar`（已移除，它会用配置里的固定颜色覆盖主题色）。改由 `MainActivity.applySystemBarColors()` 直接设置状态栏颜色与图标明暗；Android 15+ 用主题里的 `windowOptOutEdgeToEdgeEnforcement` 退出强制 edge-to-edge，页面始终从状态栏下方开始。
+- **开屏动画**：`showIntroAnimation()` 纯原生绘制（星星 `ImageView` + 自绘 `GradientWordView` 画渐变字），不依赖网页；动画期间状态栏锁定跟随开屏背景，网页在背后同时加载。
+- **主题记忆**：`ThemeBridge`（`addJavascriptInterface`）配合页面内 `MutationObserver` 读 `<html data-theme>`（`autumn-light` / `black-dark`），写入 `SharedPreferences("starlight")` 的 `theme`；下次启动据此决定开屏背景。**首次启动（无记忆）固定深色**，与网站默认一致。
+- **输入法**：`android.captureInput=false`，走 WebView 原生 `InputConnection`，光标位置插入、中文拼音组字/候选都正常。
 - **界面来源**：完全来自线上前端（Vue 3 + Vite 构建产物），本仓不含任何网页资源，`dist/index.html` 只是 115 字节占位页。
 - **因此**：站点更新 = App 立即更新；离线不可用（首次打开必须联网）。
 - 线上站点目前同样没有 PWA 清单 / Service Worker，所以「添加到主屏幕」只能得到普通书签，没有离线缓存。
@@ -139,36 +143,3 @@ keyPassword=******
 - **下载**：`MainActivity` 已加 `DownloadListener`，皮肤/文件下载走系统 `DownloadManager`，落到系统「下载」目录并弹通知。
 - **录音（语音聊天）**：站点语音功能需要麦克风时，安装后首次使用系统会请求权限，允许即可。
 - **WebView 版本**：依赖手机自带 Android System WebView（minSdk 23 / Android 6.0+），老旧机型网页兼容性由系统内核决定。
-
----
-
-## 七、姊妹项目
-
-**Flutter 原生客户端**（不走 WebView，直接调后端 `/starlight/*` 接口）在另一个仓维护；
-本仓只负责上面的 WebView 壳。两者包名不同，可同时安装：
-
-| App | 包名 |
-| --- | --- |
-| 本仓 WebView 壳 | `cool.starlight.skin` |
-| Flutter 原生客户端 | `cool.starlight.starlight_skin` |
-
----
-
-## 八、远端仓库与日常操作
-
-| remote | 地址 | 说明 |
-| --- | --- | --- |
-| `origin` | `git@github.com:aidan-austin/starlight-capacitor-shell.git` | 主仓，SSH 免密推送 |
-| `gitea` | `https://git.starlight.cool/Elysia52199/starlight-capacitor-shell.git` | 备用私仓。该站入口（腾讯云 EdgeOne → 源站 nginx）把请求体限制在 1MB，**需管理员调大 `client_max_body_size` 后**才能推完整仓（本仓约 6.7MB） |
-
-日常三步（在 `F:\sls-capacitor-shell` 目录下执行）：
-
-```powershell
-git add -A                                  # 把改动加入暂存区
-git commit -m "说明这次改了什么"              # 提交
-git push                                    # 推到 GitHub（origin）
-# git push gitea                            # 以后 Gitea 限制放开后，同步推一份
-```
-
-`.gitignore` 已排除 `node_modules/`、构建产物、`keystore.properties` 与 `*.keystore`，
-所以日常 `git add -A` 不会误传密钥或几十 MB 的编译缓存；两个分发 APK 是特例，已用 `!` 放行保留在版本控制中。
