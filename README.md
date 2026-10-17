@@ -11,29 +11,31 @@
 
 ## 一、成品 APK
 
-`releases/` 下有三个已打好的包（本仓即随源码一起分发）：
+`releases/` 下有四个已打好的包（本仓即随源码一起分发）：
 
 | 文件 | 体积 | 用途 |
 | --- | --- | --- |
-| `StarLight皮肤站-v1.1-release.apk` | 3.1 MB | **当前正式版**：修复返回键 + 状态栏/挖孔适配 |
+| `StarLight皮肤站-v1.2-release.apk` | 3.0 MB | **当前正式版**：开屏动画 + 主题记忆 + 双击退出 + 输入法修复 |
+| `StarLight皮肤站-v1.1-release.apk` | 3.1 MB | 历史版本：修复返回键 + 状态栏/挖孔适配 |
 | `StarLight皮肤站-v1.0-release.apk` | 3.2 MB | 历史版本，已用 release 密钥签名 |
 | `StarLight皮肤站-v1.0-debug.apk` | 4.2 MB | 自测用，debug 签名，体积略大 |
 
 包信息（`aapt dump badging` 实测）：
 
 ```
-package: cool.starlight.skin   versionCode=2  versionName=1.1   （v1.0 为 versionCode=1 / 1.0）
+package: cool.starlight.skin   versionCode=3  versionName=1.2   （v1.1 = 2 / 1.1，v1.0 = 1 / 1.0）
 application-label: StarLight皮肤站
 launchable-activity: cool.starlight.skin.MainActivity
 minSdkVersion=23   targetSdkVersion=35   compileSdkVersion=35
 权限：INTERNET、WRITE/READ_EXTERNAL_STORAGE(maxSdk 28)
+签名：release 密钥（证书 SHA-256 f6ee0ec6…d08d3，与 v1.0/v1.1 一致）
 ```
 
 ### 版本更新记录
 
 | 版本 | 变更 |
 | --- | --- |
-| **v1.2**（代码就绪，待打包） | ① **开屏动画**：白色像素星星自下而上渐入 → 左移，`StarLight` 沿同方向滑入（主页同款 `#FF1CF7→#B249F8` 竖向渐变字）→ 停留约 1 秒后淡出，整组水平居中<br>② **主题记忆**：启动时读网页 `<html data-theme>`（`autumn-light` / `black-dark`）存进本机，下次开屏沿用；**首次启动固定深色**（与网站默认一致）<br>③ **双击返回**：首页第一次按返回弹「再按一次退出应用」，2 秒内再按一次才退出<br>④ **输入法修复**：`android.captureInput` 改为 `false`，修复「光标放到文本中间输入、字却跑到末尾」<br>⑤ 状态栏/WebView 底色跟随主题；移除 `@capacitor/status-bar` 插件（它会用配置里的固定颜色覆盖主题色）<br>⑥ 清理：删除模板残留的 `splash.png`、示例测试类、未使用的 `site_icon.png` |
+| **v1.2** | ① **开屏动画**：白色像素星星自下而上渐入 → 左移，`StarLight` 沿同方向滑入（主页同款 `#FF1CF7→#B249F8` 竖向渐变字）→ 停留约 1 秒后淡出，整组水平居中<br>② **主题记忆**：启动时读网页 `<html data-theme>`（`autumn-light` / `black-dark`）存进本机，下次开屏沿用；**首次启动固定深色**（与网站默认一致）<br>③ **双击返回**：首页第一次按返回弹「再按一次退出应用」，2 秒内再按一次才退出<br>④ **输入法修复**：`android.captureInput` 改为 `false`，修复「光标放到文本中间输入、字却跑到末尾」<br>⑤ 状态栏/WebView 底色跟随主题；移除 `@capacitor/status-bar` 插件（它会用配置里的固定颜色覆盖主题色）<br>⑥ 清理：删除模板残留的 `splash.png`、示例测试类、未使用的 `site_icon.png`，APK 3.09 MB → 3.01 MB<br>⑦ 版本号 versionCode 2 → 3 |
 | **v1.1** | ① **返回键修复**：站内子页面返回上一页，停在首页时返回键直接退出到桌面（此前首页按返回无反应）<br>② **状态栏/挖孔适配**：网页不再顶到物理屏幕最上沿，内容不会被状态栏、前置摄像头挖孔压住（网站自身没有 `viewport-fit=cover` 与安全区 padding，所以只能由壳来让出空间）<br>③ 版本号 versionCode 1 → 2 |
 | v1.0 | 首个版本：WebView 远程加载 + 系统下载管理器接管下载 |
 

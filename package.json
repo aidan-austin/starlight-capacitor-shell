@@ -1,6 +1,6 @@
 {
   "name": "starlight-skin-app",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "StarLight 皮肤站 原生 Android 壳（Capacitor）— 远程加载 skin.starlight.cool",
   "private": true,
   "scripts": {
